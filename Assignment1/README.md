@@ -30,15 +30,3 @@ A screen recording (maximum 20 minutes) showing:
 - DataFrame being displayed and the plot generated in your `main.py`.
 
 This assignment is designed to ensure you grasp basic data fetching and manipulation techniques, which are crucial for the upcoming complex tasks in this course. Take this assignment seriously to prepare for the challenging parts of our project.
-
-## **Example: main.py**
-
-```python
-from data_fetch import download_historical_data 
-from strategy_builder import buy_func, sell_func 
-from backtest import ohlc_long_only_backtester 
-from performance import calculate_performance_metrics 
-
-symbol = "BTC-USDT"
-timeframe = "4hour" 
-df = download_historical_data(symbol, start_date, end_date, timeframe)
