@@ -1,9 +1,12 @@
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import pandas as pd
-list = [0,1,2,3,4,5]
-df = pd.DataFrame(list)
-print(df)
-df["square"] = df[0]**2
-print(df)
-plt.plot(df["square"])
-plt.show()
+
+def plot_closing_prices(data: pd.DataFrame):
+    plt.figure(figsize=(10, 5))
+    plt.plot(data.index, data['Close'], label='Closing Price')
+    plt.title("Closing Price")
+    plt.xlabel("Date")
+    plt.ylabel("Closing Price")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
