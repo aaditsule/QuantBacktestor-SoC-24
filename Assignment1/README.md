@@ -29,8 +29,6 @@ A screen recording (maximum 20 minutes) showing:
 - The coding process of your implementation (time lapse).
 - DataFrame being displayed and the plot generated in your `main.py`.
 
-**Deadline:** June 19, 2024
-
 This assignment is designed to ensure you grasp basic data fetching and manipulation techniques, which are crucial for the upcoming complex tasks in this course. Take this assignment seriously to prepare for the challenging parts of our project.
 
 ## **Example: main.py**
