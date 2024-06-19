@@ -1,17 +1,11 @@
 import yfinance as yf
 import pandas as pd
-import matplotlib.pyplot as plt
-from datetime import datetime as dt
-msft = yf.Ticker("msft")
-info = msft.info
-# for key,value in info.items():
-#     print(key,":",value)
 
-# today = dt.now().date().srtftime("%Y-%m-%d")
+def download_historical_data(symbol: str, start_date: str, end_date: str, timeframe: str = '1d') -> pd.DataFrame:
+    data = yf.download(symbol, start=start_date, end=end_date, interval=timeframe)
+    return data
 
-df = msft.history(period="max")
-# print(df)
-plt.figure()
-plt.plot(df["Close"], color ="red")
-plt.plot(df["Open"],color="green")
-plt.show()
+# start_date = "2024-06-01"
+# end_date = "2024-06-11"
+# timeframe = "1d"
+# print(download_historical_data("MSFT",start_date,end_date,timeframe))
