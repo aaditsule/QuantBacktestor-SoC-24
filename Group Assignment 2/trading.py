@@ -2,40 +2,40 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
-def strategy_build(df):
+def strategy_build(data):
     # Calculate 9-day and 20-day Simple Moving Averages (SMA)
-    df['SMA9'] = df['Close'].rolling(window=9).mean()
-    df['SMA20'] = df['Close'].rolling(window=20).mean()
+    data['SMA9'] = data['Close'].rolling(window=9).mean()
+    data['SMA20'] = data['Close'].rolling(window=20).mean()
     
     # Initialize signal column
-    df['signal'] = 0  # 0 means hold
+    data['signal'] = 0  # 0 means hold
     
     # Generate signals
-    df.loc[df['SMA9'] > df['SMA20'], 'signal'] = 1  # Buy signal
-    df.loc[df['SMA9'] < df['SMA20'], 'signal'] = -1  # Sell signal
+    data.loc[data['SMA9'] > data['SMA20'], 'signal'] = 1  # Buy signal
+    data.loc[data['SMA9'] < data['SMA20'], 'signal'] = -1  # Sell signal
     
-    return df
+    return data
 
 
 class TradingExecution:
     def __init__(self, data):
-        self.df = data
+        self.data = data
     
     def run(self):
-        returns = pd.Series(index=self.df[self.df.columns[0]])
+        returns = pd.Series(index=self.data[self.data.columns[0]])
         position = 0  # 0 means no position
         entry_price = 0.0
         
-        for i in range(len(self.df)):
-            if self.df['signal'].iloc[i] == 1 and position == 0:
+        for i in range(len(self.data)):
+            if self.data['signal'].iloc[i] == 1 and position == 0:
                 # Buy signal and no position held
-                entry_price = self.df['Close'].iloc[i]
+                entry_price = self.data['Close'].iloc[i]
                 position = 1  # Long position
                 returns.iloc[i] = 0
                 
-            elif self.df['signal'].iloc[i] == -1 and position == 1:
+            elif self.data['signal'].iloc[i] == -1 and position == 1:
                 # Sell signal and long position held
-                exit_price = self.df['Close'].iloc[i]
+                exit_price = self.data['Close'].iloc[i]
                 
                 # Calculate returns
                 returns.iloc[i] = (exit_price - entry_price) / entry_price
@@ -47,11 +47,11 @@ class TradingExecution:
         # Handle unclosed position at the end of the period
         if position == 1:
             # Calculate returns assuming exit at the last close price
-            last_close_price = self.df['Close'].iloc[-1]
+            last_close_price = self.data['Close'].iloc[-1]
             returns.iloc[-1] = (last_close_price - entry_price) / entry_price
 
         (1 + returns).cumprod().to_csv('returns.csv')
-        self.df.to_csv('strategy.csv')
+        self.data.to_csv('strategy.csv')
         plt.plot((1 + returns).cumprod() - 1)
         plt.xlabel('Date')
         plt.ylabel('Returns')
