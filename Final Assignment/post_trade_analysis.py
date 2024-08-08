@@ -6,113 +6,100 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-class StrategyAnalysis:
-    def __init__(self, returns_series):
-        self.returns = returns_series
+class TradingStrategyAnalysis:
+    def __init__(self, return_series):
+        self.returns = return_series
         
-    def cumulative_returns(self):
-        """
-        Calculate cumulative returns of the trading strategy.
-        """
-        cumulative = (1 + self.returns).cumprod() - 1
-        return cumulative
+    def calc_cumulative_returns(self):
+        # Compute cumulative returns from the strategy's return series.
+        cum_returns = (1 + self.returns).cumprod() - 1
+        return cum_returns
     
-    def maximum_drawdown(self):
-        """
-        Calculate maximum drawdown of the trading strategy.
-        """
-        cum_returns = (1 + self.returns).cumprod()
-        drawdown = 1 - cum_returns.div(cum_returns.cummax())
-        max_drawdown = drawdown.max()
-        return max_drawdown
+    def calc_max_drawdown(self):
+        # Compute the maximum drawdown from the strategy's cumulative returns.
+        cumulative_returns = (1 + self.returns).cumprod()
+        drawdowns = 1 - cumulative_returns / cumulative_returns.cummax()
+        max_dd = drawdowns.max()
+        return max_dd
     
-    def sharpe_ratio(self, risk_free_rate=0.0, periods_per_year=252):
-        """
-        Calculate Sharpe ratio of the trading strategy.
-        """
-        excess_returns = self.returns - risk_free_rate / periods_per_year
-        annualized_return = np.mean(self.returns) * periods_per_year
-        annualized_volatility = np.std(self.returns) * np.sqrt(periods_per_year)
-        sharpe = annualized_return / annualized_volatility
-        return sharpe
+    def calc_sharpe_ratio(self, risk_free_rate=0.0, trading_days=252):
+        # Compute the Sharpe ratio for the strategy.
+        adjusted_returns = self.returns - risk_free_rate / trading_days
+        annual_return = np.mean(adjusted_returns) * trading_days
+        annual_volatility = np.std(adjusted_returns) * np.sqrt(trading_days)
+        sharpe_ratio = annual_return / annual_volatility
+        return sharpe_ratio
     
-    def sortino_ratio(self, risk_free_rate=0.0, periods_per_year=252):
-        """
-        Calculate Sortino ratio of the trading strategy.
-        """
+    def calc_sortino_ratio(self, risk_free_rate=0.0, trading_days=252):
+        # Compute the Sortino ratio, focusing on downside risk.
         downside_returns = self.returns[self.returns < 0]
-        annualized_return = np.mean(self.returns) * periods_per_year
-        downside_deviation = np.std(downside_returns) * np.sqrt(periods_per_year)
-        sortino = annualized_return / downside_deviation
-        return sortino
+        annual_return = np.mean(self.returns) * trading_days
+        downside_volatility = np.std(downside_returns) * np.sqrt(trading_days)
+        sortino_ratio = annual_return / downside_volatility
+        return sortino_ratio
     
-    def hit_ratio(self):
-        """
-        Calculate the percentage of profitable trades (Hit Ratio).
-        """
-        num_profitable = np.sum(self.returns > 0)
-        total_trades = np.sum(self.returns != 0)
-        hit_ratio = num_profitable / total_trades
+    def calc_hit_ratio(self):
+        # Compute the hit ratio, representing the percentage of profitable trades.
+        positive_trades = np.sum(self.returns > 0)
+        total_trades = len(self.returns[self.returns != 0])
+        hit_ratio = positive_trades / total_trades if total_trades > 0 else 0
         return hit_ratio
     
-    def monthly_returns_heatmap(self):
-        """
-        Generate a heatmap of monthly returns for each year.
-        """
-        monthly_returns = self.returns.resample('ME').apply(lambda x: (1 + x).prod() - 1)
-        monthly_returns.index = pd.MultiIndex.from_tuples([(d.year, d.month) for d in monthly_returns.index],
+    def generate_monthly_returns_heatmap(self):
+        # Create a heatmap to visualize monthly returns over different years.
+        monthly_returns = self.returns.resample('M').apply(lambda x: (1 + x).prod() - 1)
+        monthly_returns.index = pd.MultiIndex.from_tuples([(date.year, date.month) for date in monthly_returns.index],
                                                   names=['Year', 'Month'])
         monthly_returns = monthly_returns.unstack().fillna(0)
         plt.figure(figsize=(10, 8))
-        sns.heatmap(monthly_returns, annot=True, cmap='coolwarm', fmt=".2%")
+        sns.heatmap(monthly_returns, annot=True, cmap='RdYlGn', fmt=".2%")
         plt.title('Monthly Returns Heatmap')
         plt.xlabel('Month')
         plt.ylabel('Year')
         plt.show()
     
     def plot_cumulative_returns(self):
-        """
-        Generate a plot of cumulative returns over time.
-        """
-        cumulative = self.cumulative_returns()
+        # Visualize cumulative returns over time.
+        cumulative = self.calc_cumulative_returns()
         plt.figure(figsize=(10, 6))
-        plt.plot(cumulative.index, cumulative.values, label='Cumulative Returns', color='blue', linestyle='-')
-        plt.title('Cumulative Returns')
+        plt.plot(cumulative.index, cumulative.values, label='Cumulative Returns', color='green', linestyle='-')
+        plt.title('Cumulative Returns Over Time')
         plt.xlabel('Date')
         plt.ylabel('Cumulative Returns')
         plt.legend()
         plt.grid(True)
         plt.show()
 
-# Example usage:
+# Sample execution:
 if __name__ == "__main__":
-    # Example Pandas Series for returns
+    # Define the stock ticker, start and end dates, and interval.
     ticker = 'AAPL'
     start_date = '2014-06-30'
     end_date = '2024-06-30'
     interval = '1d'
-    stock = StockAnalyzer(ticker, start_date, end_date, interval)
-    if stock.is_data_available():
-        stock.download_data()
-        stock.data = strategy_build(stock.data)
-        trading = TradingExecution(stock.data)
-        returns = trading.run()
     
-        # Instantiate the analysis class
-        strategy_analysis = StrategyAnalysis(returns)
+    stock_data = StockAnalyzer(ticker, start_date, end_date, interval)
+    if stock_data.is_data_available():
+        stock_data.download_data()
+        stock_data.data = strategy_build(stock_data.data)
+        trading_exec = TradingExecution(stock_data.data)
+        strategy_returns = trading_exec.run()
     
-    # Example of using functions
-    print("\nMaximum Drawdown:")
-    print(strategy_analysis.maximum_drawdown())
-    print("\nSharpe Ratio:")
-    print(strategy_analysis.sharpe_ratio())
-    print("\nSortino Ratio:")
-    print(strategy_analysis.sortino_ratio())
-    print("\nHit Ratio:")
-    print(strategy_analysis.hit_ratio())
+        # Analyze the strategy
+        analysis = TradingStrategyAnalysis(strategy_returns)
     
-    # Generate monthly returns heatmap
-    strategy_analysis.monthly_returns_heatmap()
-    
-    # Plot cumulative returns
-    strategy_analysis.plot_cumulative_returns()
+        # Example of using analysis methods
+        print("\nMaximum Drawdown:")
+        print(analysis.calc_max_drawdown())
+        print("\nSharpe Ratio:")
+        print(analysis.calc_sharpe_ratio())
+        print("\nSortino Ratio:")
+        print(analysis.calc_sortino_ratio())
+        print("\nHit Ratio:")
+        print(analysis.calc_hit_ratio())
+        
+        # Generate and display heatmap of monthly returns
+        analysis.generate_monthly_returns_heatmap()
+        
+        # Plot and display cumulative returns over time
+        analysis.plot_cumulative_returns()
