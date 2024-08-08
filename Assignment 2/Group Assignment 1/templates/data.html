@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Data Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/data_style.css') }}">
+</head>
+<body>
+    <h1 class="page-title">Stock Data Analysis</h1>
+    <h2>Data Characteristics</h2>
+
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    {% for col in columns %}
+                    <th>{{ col }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    {% for cell in row %}
+                    <td>{{ cell }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if missing_stock_data %}
+    <h2>Missing Data</h2>
+    <div class="container">
+        <div class="missing-data">
+            <p>The following data points have been imputed:</p>
+            <table>
+                <thead>
+                    <tr>
+                        {% for col in missing_stock_data.columns %}
+                        <th>{{ col }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for index, row in missing_stock_data.iterrows() %}
+                    <tr>
+                        {% for col in missing_stock_data.columns %}
+                        {% if missing_stock_data[col][index] == missing_stock_data[col][index] %}
+                        <td>{{ missing_stock_data[col][index] }}</td>
+                        {% else %}
+                        <td style="color: red;">{{ stock_data[col][index] }}</td>
+                        {% endif %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <h2>Cummulative Returns</h2>
+    <div class="container">
+        <canvas id="myChart">
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+            <script type="text/javascript">
+                var data = {{ json_data | safe }};
+            </script>
+            <script src="{{ url_for('static', filename='javascript/chart.js') }}"></script>
+        </canvas>
+    </div>
+</body>
+</html>

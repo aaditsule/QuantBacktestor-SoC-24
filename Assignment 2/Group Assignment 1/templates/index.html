@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Data Analyzer</title>
+    <link href="{{ url_for('static', filename='styles/style.css') }}" rel="stylesheet" />
+</head>
+<body>
+    <header>
+        <h1>Stock Data Analyzer</h1>
+    </header>
+    <div class="container">
+        <form id="stock-form" action="/data">
+            <div class="form-group">
+                <label for="symbol">Stock Symbol:</label>
+                <div class="symbol-container">
+                    <input type="text" id="symbol" name="symbol" placeholder="Enter stock symbol..." required>
+                    <button type="button" id="cancel-button">&#10006;</button>
+                </div>
+                <div class="result-box"></div> <!-- Autocomplete results will appear here -->
+            </div>
+            <div class="form-group">
+                <label for="start-date">Start Date:</label>
+                <input type="date" id="start-date" name="start-date" required>
+            </div>
+            <div class="form-group">
+                <label for="end-date">End Date:</label>
+                <input type="date" id="end-date" name="end-date" required>
+            </div>
+            <div class="form-group">
+                <label for="interval">Interval:</label>
+                <select id="interval" name="interval"></select>
+            </div>
+            <button type="submit">Analyze</button>
+        </form>
+    </div>
+    <script src="{{ url_for('static', filename='javascript/constants.js') }}" type="module"></script>
+    <script src="{{ url_for('static', filename='javascript/autocomplete.js') }}" type="module"></script>
+    <script src="{{ url_for('static', filename='javascript/loadinterval.js') }}" type="module"></script>    
+</body>
+</html>

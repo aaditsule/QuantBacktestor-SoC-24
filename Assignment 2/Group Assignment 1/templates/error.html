@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Data Not Found</title>
+    <link href="{{ url_for('static', filename='styles/error_style.css') }}" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Error</h1>
+        </header>
+        <div class="error-message">
+            <p>Stock data for the specified duration could not be found.</p>
+            <a href="{{ url_for('home') }}" class="button" id="back-button">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>
